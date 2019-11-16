@@ -43,7 +43,10 @@ def get_model(ctx, image_size, model_str, layer):
 class FaceModel:
   def __init__(self, args):
     self.args = args
-    ctx = mx.gpu(args.gpu)
+    if args.gpu >= 0:
+      ctx = mx.gpu(args.gpu)
+    else:
+      ctx = mx.cpu()
     _vec = args.image_size.split(',')
     assert len(_vec)==2
     image_size = (int(_vec[0]), int(_vec[1]))
@@ -70,14 +73,42 @@ class FaceModel:
   def get_input(self, face_img):
     ret = self.detector.detect_face(face_img, det_type = self.args.det)
     if ret is None:
+      tmpthreshold=self.detector.threshold
+      self.detector.threshold=[0.2,0.5,0.8]
+      ret = self.detector.detect_face(face_img, det_type = self.args.det)
+      self.detector.threshold=tmpthreshold
+    if ret is None:
       return None
     bbox, points = ret
     if bbox.shape[0]==0:
       return None
+    """
+    print(bbox)
+    print(points)
+    print("------------------------------")
+    point1=(int(bbox[0][0]),int(bbox[0][1]))
+    point2=(int(bbox[0][2]),int(bbox[0][3]))
+    draw_0 = cv2.rectangle(face_img, point1, point2, (255, 0, 0), 2)
+    points_list=[]
+    for i in range(0, 9, 2):
+      points_list.append((int(points[0][i]), int(points[0][i+1])))
+    print(points_list)
+    """
     bbox = bbox[0,0:4]
     points = points[0,:].reshape((2,5)).T
-    #print(bbox)
-    #print(points)
+    """
+    print("------------------------------")
+    print(bbox)
+    print(points)
+    print("------------------------------")
+    points_list=[]
+    for i in range(0, 5):
+      points_list.append((int(points[i][0]), int(points[i][1])))
+    print(points_list)
+    for point in points_list:
+	    cv2.circle(draw_0, point, 2, (0, 0, 255), 2)
+    cv2.imwrite("test.png", draw_0)
+    """
     nimg = face_preprocess.preprocess(face_img, bbox, points, image_size='112,112')
     nimg = cv2.cvtColor(nimg, cv2.COLOR_BGR2RGB)
     aligned = np.transpose(nimg, (2,0,1))
