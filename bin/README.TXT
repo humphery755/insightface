@@ -1,6 +1,6 @@
 https://github.com/deepinsight/insightface
 https://www.cnblogs.com/zyly/p/9703614.html
-model£ºhttps://pan.baidu.com/s/1knmJxbNKMzJJ3SvofP4K0A  code£ºcxdu 
+modelÂ£Âºhttps://pan.baidu.com/s/1knmJxbNKMzJJ3SvofP4K0A  code: cxdu 
 
 apt-get install -y make build-essential libssl-dev zlib1g-dev libbz2-dev \
 libreadline-dev libsqlite3-dev wget curl llvm libncurses5-dev libncursesw5-dev \
